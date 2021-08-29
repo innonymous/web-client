@@ -1,9 +1,11 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-ReactDOM.render(
-  <React.StrictMode>
+import Innonymous from 'innonymous';
 
-  </React.StrictMode>,
-  document.getElementById('root')
+ReactDOM.render(
+    <React.StrictMode>
+        <Innonymous />
+    </React.StrictMode>,
+    document.getElementById('root')
 );
