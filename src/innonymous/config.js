@@ -1,5 +1,5 @@
 
-let backendHost = process.env.BACKEND_HOST || 'http://10.244.1.16';
+let backendHost = process.env.BACKEND_HOST || 'https://innonymous.tk/api/docs';
 let backendPort = process.env.BACKEND_PORT || 8000;
 let backendUrl = backendHost + ':' + backendPort;
 

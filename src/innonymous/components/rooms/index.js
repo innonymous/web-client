@@ -8,8 +8,8 @@ import { backendUrl } from 'innonymous/config.js'
 
 
 class Rooms extends React.Component {
-    constructor() {
-        super(null);
+    constructor(props) {
+        super(props);
 
         this.state = {
             data: {}, 
@@ -18,7 +18,7 @@ class Rooms extends React.Component {
         }
     }
 
-    componentWillMount() {
+    componentDidMount() {
         fetch(backendUrl + '/rooms/')
             .then(response => response.json())
             .then(result => this.setState({data: result, isFetching: false}))
