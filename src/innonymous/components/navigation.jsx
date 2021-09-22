@@ -12,6 +12,7 @@ import {instanceOf} from 'prop-types';
 import {Cookies, withCookies} from 'react-cookie';
 
 import Api from 'innonymous/utils/api';
+import Register from 'innonymous/components/register';
 
 
 class Navigation extends React.Component {
@@ -22,6 +23,30 @@ class Navigation extends React.Component {
     constructor(props) {
         super(props);
         this.state = {};
+
+        const { cookies } = props;
+        this.state = {JWT: cookies.get('JWT')};
+    }
+
+    onRequestRegister() {
+        if (this.state.JWT !== undefined) {
+            return;
+        }
+
+        this.setState({requestRegister: true})
+    }
+
+    onRegisterFinished(response) {
+        this.setState({requestRegister: false})
+
+        if (response === undefined) {
+            return;
+        }
+
+        const { cookies } = this.props;
+        cookies.set('JWT', response.access_token);
+
+        this.setState({JWT: cookies.get('JWT')});
     }
 
     onCreatingRequested() {
@@ -36,11 +61,12 @@ class Navigation extends React.Component {
     render() {
         return (
             <Navbar expand='false' className='border-bottom'>
+                <Register show={this.state.requestRegister} onHide={this.onRegisterFinished.bind(this)}/>
                 <Navbar.Brand>Innonymous</Navbar.Brand>
                 <Navbar.Toggle aria-controls='search-form-collapse'>
                     <Plus/>
                 </Navbar.Toggle>
-                <Navbar.Collapse id='search-form-collapse'>
+                <Navbar.Collapse id='search-form-collapse' onClick={this.onRequestRegister.bind(this)}>
                     <Row className='m-0 p-0 d-flex flex-row mt-3'>
                         <Col className='m-0 p-0 flex-grow-1 m-1'>
                              <Form.Control
