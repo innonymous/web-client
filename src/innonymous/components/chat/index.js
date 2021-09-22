@@ -1,15 +1,3 @@
-import React from 'react';
-
-import Container from 'react-bootstrap/Container';
-
-class Chat extends React.Component {
-    render() {
-        return (
-            <Container {...this.props} className={'chat ' + this.props.className}>
-
-            </Container>
-        );
-    }
-}
+import Chat from 'innonymous/components/chat/chat';
 
 export default Chat;
