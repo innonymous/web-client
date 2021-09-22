@@ -2,7 +2,7 @@ import ReconnectingWebSocket from 'reconnecting-websocket';
 
 
 export default class Api {
-    static url = process.env.REACT_APP_API_URL;
+    static url = process.env.REACT_APP_API_URL || window.API_URL;
     static webSocketClient = new ReconnectingWebSocket(
         Api.getWebSocketUrl(), [], {
             connectionTimeout: 500,
