@@ -40,4 +40,4 @@ $ npm start
 ```
 
 
-Done! Frontend is avaliable at http://localhost:8080
+Done! Frontend is avaliable at http://localhost:3000
