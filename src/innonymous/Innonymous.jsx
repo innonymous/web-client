@@ -5,7 +5,7 @@ import update from 'immutability-helper';
 
 import 'innonymous/assets/css/innonymous.css';
 import Api from 'innonymous/Api';
-import Composer from 'innonymous/Сomposer';
+import Composer from 'innonymous/Composer';
 
 
 class Innonymous extends React.Component {
