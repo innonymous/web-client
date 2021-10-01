@@ -1,92 +1,80 @@
-import 'innonymous/assets/css/chat/chat.css';
-
 import React from 'react';
 
-import ToastContainer from 'react-bootstrap/ToastContainer';
-import Container from 'react-bootstrap/Container';
-import Row from 'react-bootstrap/Row';
 import Navbar from 'react-bootstrap/Navbar';
+import Container from 'react-bootstrap/Container';
 import Placeholder from 'react-bootstrap/Placeholder';
-import ArrowLeft from 'react-bootstrap-icons/dist/icons/arrow-left';
+import {ArrowLeft} from 'react-bootstrap-icons';
 
-import Message from 'innonymous/components/chat/message';
-import Input from "innonymous/components/chat/input";
+import 'innonymous/assets/css/chat/chat.css'
+import Input from 'innonymous/components/chat/Input';
+import Message from 'innonymous/components/chat/Message';
+import Api from 'innonymous/Api';
 
 
-export default class Chat extends React.Component {
-    constructor(props) {
-        super(props);
-        this.messagesEndRef = React.createRef();
-    }
+class Chat extends React.Component {
+    onMessagesScroll(event) {
+        if (event.target.scrollHeight - Math.abs(event.target.scrollTop) !== event.target.clientHeight) {
+            return;
+        }
 
-    componentDidMount() {
-        this.messagesEndRef.current.scrollIntoView({ behavior: 'smooth', block: 'end'});
-    }
+        // No messages.
+        if (this.props.room.messages.length === 0) {
+            return;
+        }
 
-    componentDidUpdate() {
-        this.messagesEndRef.current.scrollIntoView({ block: 'end'});
+        // Get oldest message timestamp.
+        const oldestMessage = this.props.room.messages.at(-1).time.toISOString();
+
+        // Request more messages.
+        Api.getRoomMessages(this.props.room.uuid, {limit: 10, before: oldestMessage}).then(
+            this.props.onMessages
+        );
     }
 
     render() {
-        if (this.props.room === undefined) {
-            return (
-                <Container className='chat mt-5 m-0 p-0 w-100 h-100 d-flex flex-column'>
-                    <Row className='m-0 p-0'>
-                        <Navbar expand='false' className='border-bottom'>
-                            <Placeholder as={Navbar.Brand} animation='wave'>
-                                <Placeholder className='room-name-placeholder'/>
-                            </Placeholder>
-                        </Navbar>
-                    </Row>
-                    <Row className='m-0 p-0 flex-grow-1'>
-                        <ToastContainer className='messages'>
-
-                        </ToastContainer>
-                    </Row>
+        return (
+            <div className={'d-flex flex-column justify-content-between ' + this.props.className}>
+                <Navbar className={'border-bottom'} expand={'false'}>
+                    <Container className={'justify-content-start'} fluid={true}>
+                        <Navbar.Toggle onClick={() => this.props.history.push('/rooms')}>
+                            <ArrowLeft className={'back-image'}/>
+                        </Navbar.Toggle>
+                        {this.renderName()}
+                    </Container>
+                </Navbar>
+                <Container
+                    className={'d-flex flex-column-reverse flex-grow-1 overflow-auto pt-3'}
+                    onScroll={this.onMessagesScroll.bind(this)}
+                    fluid={true}
+                >
+                    {this.props.room.messages.map(
+                        (message, index) => {
+                            return (
+                                <Message key={index} message={message} user={this.props.users[message.user_uuid]}/>
+                            );
+                        }
+                    )}
                 </Container>
+                <Input roomUuid={this.props.room.uuid} history={this.props.history}/>
+            </div>
+        );
+    }
+
+    renderName() {
+        if (this.props.room === undefined || this.props.room.name === undefined) {
+            return (
+                <Placeholder as={Navbar.Brand} className={'ms-3'} animation='wave'>
+                    <Placeholder className={'name-placeholder'}/>
+                </Placeholder>
             );
         }
 
-        const raw_messages = Object.values(this.props.room.messages).sort(
-            (left, right) => left.time > right.time ? 1 : -1
-        );
-
-        const messages = [];
-        for (const message of raw_messages) {
-            const user = this.props.users[message.user_uuid];
-
-            let position = 'left';
-            if (this.props.user !== undefined && this.props.user.uuid === message.user_uuid) {
-                position = 'right';
-            }
-
-            messages.push(<Message
-                key={message.uuid}
-                message={message}
-                user={user}
-                position={position}
-            />)
-        }
-
         return (
-            <Container className='chat m-0 p-0 w-100 h-100 d-flex flex-column' fluid>
-                <Row className='m-0 p-0'>
-                    <Navbar expand='false' className='border-bottom' fixed='top' bg='light'>
-                        <Navbar.Brand>
-                            <ArrowLeft className='me-3' onClick={() => this.props.onClick()}/>{this.props.room.name}
-                        </Navbar.Brand>
-                    </Navbar>
-                </Row>
-                <Row className='m-0 p-0 flex-grow-1 overflow-scroll'>
-                    <Container className='messages w-100 h-100 overflow-scroll'>
-                        {messages}
-                        <div ref={this.messagesEndRef} id='latest-s' />
-                    </Container>
-                </Row>
-                <Row className='m-0 p-3 border-top'>
-                    <Input room={this.props.room.uuid}/>
-                </Row>
-            </Container>
+            <Navbar.Brand className={'ms-3'}>
+                {this.props.room.name}
+            </Navbar.Brand>
         );
     }
 }
+
+export default Chat;

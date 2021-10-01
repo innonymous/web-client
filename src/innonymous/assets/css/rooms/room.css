@@ -1,4 +1,43 @@
 .card {
     border: none;
-    height: 100px;
+    border-radius: 0;
+}
+
+.selected {
+    animation: roomSelected 0.2s;
+    animation-fill-mode: forwards;
+}
+
+.time {
+    min-width: 100px;
+}
+
+.placeholder {
+    border-radius: 3px;
+}
+
+.name-placeholder {
+    width: 100px
+}
+
+.last-user-placeholder {
+    width: 80px
+}
+
+.last-message-placeholder {
+    width: 150px
+}
+
+.time-placeholder {
+    width: 50px
+}
+
+@keyframes roomSelected {
+    from {
+        filter: invert(0%);
+    }
+
+    to {
+        filter: invert(10%);
+    }
 }

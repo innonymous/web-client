@@ -1,141 +1,176 @@
-import 'innonymous/assets/css/rooms/room.css'
-
 import React from 'react';
 
-import Row from 'react-bootstrap/Row';
-import Col from 'react-bootstrap/Col';
 import Card from 'react-bootstrap/Card';
 import Placeholder from 'react-bootstrap/Placeholder';
-import Badge from 'react-bootstrap/Badge';
+
+import 'innonymous/assets/css/rooms/room.css';
 
 
-export default class Room extends React.Component {
-    renderName() {
-        if (this.props.room === undefined || this.props.room.name === undefined) {
-            return (
-                <Placeholder as={Card.Title} animation='wave'>
-                    <Placeholder xs={10}/>
-                </Placeholder>
-            )
-        }
+class Room extends React.Component {
+    static selectRoomDelay = 100;
 
-        return (
-            <Card.Title>
-                {this.props.room.name}
-            </Card.Title>
-        )
+    constructor(props) {
+        super(props);
+        this.state = {isSelectedRequested: false};
     }
 
-    renderInfo() {
-        if (this.props.room === undefined) {
-            return (
-                <div>
-                    <Placeholder as={Card.Text} animation='wave'>
-                        <Placeholder xs={6}/>
-                    </Placeholder>
-                    <Placeholder as={Badge} animation='wave' className='badge bg-info'>
-                        <Placeholder/>
-                    </Placeholder>
-                </div>
-            )
-        }
-
-        // No messages.
-        if (Object.keys(this.props.room.messages).length === 0) {
-            return;
-        }
-
-        // Sent time.
-        const date = Object.values(this.props.room.messages).reduce(
-            (left, right) => left.time > right.time ? left : right
-        ).time;
-
-        return (
-            <div>
-                <Card.Text className='fw-light lh-1 m-1'>
-                    {date.toDateString()} {date.toLocaleTimeString()}
-                </Card.Text>
-                {/*<span className='badge bg-info'>*/}
-                {/*    {this.state.unread}*/}
-                {/*</span>*/}
-            </div>
-        )
+    isSelected() {
+        return this.props.history.location.pathname.includes(this.props.room.uuid);
     }
 
-    renderLastMessage() {
-        // Just placeholder.
-        if (this.props.room === null) {
-            return (
-                <div>
-                    <Placeholder as={Card.Subtitle} className='text-muted' animation='wave'>
-                        <Placeholder xs={8}/>
-                    </Placeholder>
-                    <Placeholder as={Card.Text} animation='wave'>
-                        <Placeholder xs={12}/>
-                    </Placeholder>
-                </div>
-            )
-        }
+    requestSelect() {
+        // Requested.
+        this.setState({isSelectedRequested: true});
 
-        // No messages.
-        if (Object.keys(this.props.room.messages).length === 0) {
-            return (
-                <div>
-                    <Card.Subtitle className='text-muted'>
-                        No messages
-                    </Card.Subtitle>
-                </div>
-            )
-        }
-
-
-        const message = Object.values(this.props.room.messages).reduce(
-            (left, right) => left.time > right.time ? left : right
+        // Make a transition after selectRoomDelay milliseconds.
+        setTimeout(
+            () => {
+                // We make a transition.
+                this.setState({isSelectedRequested: false});
+                this.props.history.push(`/rooms/${this.props.room.uuid}`)
+            },
+            Room.selectRoomDelay
         );
-
-
-        // User not loaded.
-        if (this.props.users[message.user_uuid] === undefined) {
-            return (
-                <div>
-                    <Placeholder as={Card.Subtitle} className='text-muted' animation='wave'>
-                        <Placeholder xs={8}/>
-                    </Placeholder>
-                    <Card.Text>
-                        {message.data}
-                    </Card.Text>
-                </div>
-            )
-        }
-
-
-        return (
-            <div>
-                <Card.Subtitle className='text-muted'>
-                    {this.props.users[message.user_uuid].name}
-                </Card.Subtitle>
-                <Card.Text>
-                    {message.data}
-                </Card.Text>
-            </div>
-        )
     }
 
     render() {
         return (
-            <Card onClick={() => this.props.onClick(this.props.room.uuid)}>
+            <Card
+                onClick={() => {this.requestSelect()}}
+                className={this.state.isSelectedRequested || this.isSelected() ? 'selected' : ''}
+            >
                 <Card.Body>
-                    <Row>
-                        <Col>
+                    <div className={'d-flex flex-row justify-content-between'}>
+                        <div className={'d-flex flex-column text-truncate'}>
                             {this.renderName()}
+                            {this.renderLastUser()}
                             {this.renderLastMessage()}
-                        </Col>
-                        <Col className='text-end col-5'>
-                            {this.renderInfo()}
-                        </Col>
-                    </Row>
+                        </div>
+                        <div className={'d-flex flex-column text-end time'}>
+                            {this.renderTime()}
+                        </div>
+                    </div>
                 </Card.Body>
             </Card>
         );
     }
+
+    renderName() {
+        if (this.props.room === undefined || this.props.room.name === undefined) {
+            return (
+                <Placeholder as={Card.Title} animation='wave'>
+                    <Placeholder className={'name-placeholder'}/>
+                </Placeholder>
+            );
+        }
+
+        return (
+            <Card.Title className={'text-truncate'}>
+                {this.props.room.name}
+            </Card.Title>
+        );
+    }
+
+    renderTime() {
+        if (this.props.room === undefined || this.props.room.messages === undefined) {
+            return (
+                <Placeholder animation='wave'>
+                    <Placeholder className={'time-placeholder'}/>
+                </Placeholder>
+            );
+        }
+
+        // No messages.
+        if (this.props.room.messages.length === 0) {
+            return '';
+        }
+
+        // Time of the message.
+        const time = this.props.room.messages[0].time
+        // Difference in days.
+        const difference = (new Date() - time) / 1000 / 3600 / 24;
+
+        // More than year.
+        if (difference > 365) {
+            return time.toLocaleDateString(undefined, {
+                year: 'numeric', month: 'short', day: 'numeric'
+            });
+        }
+
+        // More than week.
+        if (difference > 7) {
+            return time.toLocaleDateString(undefined, {
+                month: 'short', day: 'numeric'
+            });
+        }
+
+        // More than day.
+        if (difference > 1) {
+            return time.toLocaleDateString(undefined, {
+                weekday: 'long'
+            });
+        }
+
+        // Less a day.
+        return time.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'});
+    }
+
+    renderLastUser() {
+        const placeholder = (
+            <Placeholder as={Card.Subtitle} className={'mb-2 text-muted'} animation={'wave'}>
+               <Placeholder className={'last-user-placeholder'}/>
+            </Placeholder>
+        );
+
+        // No room or undefined messages.
+        if (this.props.room === undefined || this.props.room.messages === undefined) {
+            return placeholder;
+        }
+
+        // No messages.
+        if (this.props.room.messages.length === 0) {
+            return (
+                <Card.Subtitle className={'mt-2 text-muted'}>
+                    No messages
+                </Card.Subtitle>
+            );
+        }
+
+        // User info.
+        const user = this.props.users[this.props.room.messages[0].user_uuid];
+
+        // User not loaded yet.
+        if (user === undefined) {
+            return placeholder
+        }
+
+        return (
+            <Card.Subtitle className={'mb-2 text-muted text-truncate'}>
+                {user.name}
+            </Card.Subtitle>
+        );
+    }
+
+    renderLastMessage() {
+        if (this.props.room === undefined || this.props.room.messages === undefined) {
+            return (
+                <Placeholder as={Card.Text} animation={'wave'}>
+                    <Placeholder className={'last-message-placeholder'}/>
+                </Placeholder>
+            );
+        }
+
+        // No messages.
+        if (this.props.room.messages.length === 0) {
+            return '';
+        }
+
+        return (
+           <Card.Text className={'text-truncate'}>
+               {this.props.room.messages[0].data}
+           </Card.Text>
+        );
+    }
 }
+
+export default Room;
