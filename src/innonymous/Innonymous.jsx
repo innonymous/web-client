@@ -109,7 +109,7 @@ class Innonymous extends React.Component {
                 message.time = new Date(message.time);
 
                 // If user does not exist locally.
-                if (state.users[message.user_uuid] === undefined && new_users[message.user_uuid] === undefined) {
+                if (!(state.users[message.user_uuid] && state.users[message.user_uuid].name) && new_users[message.user_uuid] === undefined) {
                     // Set flag, that we requested info about this user.
                     new_users[message.user_uuid] = true;
                     // Request info.
@@ -117,7 +117,7 @@ class Innonymous extends React.Component {
                 }
 
                 // If room does not exist locally.
-                if (state.rooms[message.room_uuid] === undefined) {
+                if (!(state.rooms[message.room_uuid] && state.rooms[message.room_uuid].name)){
                     // If it is a first message in current loop for the room.
                     if (spec.rooms[message.room_uuid] === undefined) {
                         // Create new room.

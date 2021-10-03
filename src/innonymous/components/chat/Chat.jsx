@@ -4,6 +4,7 @@ import Navbar from 'react-bootstrap/Navbar';
 import Container from 'react-bootstrap/Container';
 import Placeholder from 'react-bootstrap/Placeholder';
 import {ArrowLeft} from 'react-bootstrap-icons';
+import Spinner from 'react-bootstrap/Spinner';
 
 import 'innonymous/assets/css/chat/chat.css'
 import Input from 'innonymous/components/chat/Input';
@@ -12,22 +13,48 @@ import Api from 'innonymous/Api';
 
 
 class Chat extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {newMessagesRequested: false};
+    }
+
     onMessagesScroll(event) {
-        if (event.target.scrollHeight - Math.abs(event.target.scrollTop) !== event.target.clientHeight) {
-            return;
-        }
+        this.setState(
+            (state) => {
+                // Already requested.
+                if (state.newMessagesRequested) {
+                    return;
+                }
 
-        // No messages.
-        if (this.props.room.messages.length === 0) {
-            return;
-        }
+                // If container not scrolled enough.
+                if (event.target.scrollHeight > event.target.clientHeight + Math.abs(event.target.scrollTop) + 1) {
+                    return;
+                }
 
-        // Get oldest message timestamp.
-        const oldestMessage = this.props.room.messages.at(-1).time.toISOString();
+                // No messages.
+                if (this.props.room.messages.length === 0) {
+                    return;
+                }
 
-        // Request more messages.
-        Api.getRoomMessages(this.props.room.uuid, {limit: 10, before: oldestMessage}).then(
-            this.props.onMessages
+                // Get oldest message timestamp.
+                const oldestMessage = this.props.room.messages.at(-1).time.toISOString();
+
+                // Request more messages.
+                Api.getRoomMessages(this.props.room.uuid, {limit: 10, before: oldestMessage}).then(
+                    this.props.onMessages
+                ).then(
+                    () => {
+                        setTimeout(() => this.setState({newMessagesRequested: false}), 1000);
+                    }
+                ).catch(
+                    (exc) => {
+                        setTimeout(() => this.setState({newMessagesRequested: false}), 1000);
+                        throw exc;
+                    }
+                );
+
+                return {newMessagesRequested: true};
+            }
         );
     }
 
@@ -44,7 +71,7 @@ class Chat extends React.Component {
                 </Navbar>
                 <Container
                     className={'d-flex flex-column-reverse flex-grow-1 overflow-auto pt-3'}
-                    onScroll={this.onMessagesScroll.bind(this)}
+                    onScrollCapture={this.onMessagesScroll.bind(this)}
                     fluid={true}
                 >
                     {this.props.room.messages.map(
@@ -54,6 +81,11 @@ class Chat extends React.Component {
                             );
                         }
                     )}
+                    {this.state.newMessagesRequested &&
+                        <div className={'d-flex flex-row justify-content-center mb-2'}>
+                            <Spinner className={'mt-1 me-1'} size={'sm'} animation={'border'}/>Loading...
+                        </div>
+                    }
                 </Container>
                 <Input roomUuid={this.props.room.uuid} history={this.props.history}/>
             </div>
