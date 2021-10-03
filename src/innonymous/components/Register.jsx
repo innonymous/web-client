@@ -12,7 +12,7 @@ import {Cookies, withCookies} from 'react-cookie';
 
 
 class Register extends React.Component {
-    static nameRegex = '^[A-Za-z0-9А-Яа-яЁё][A-Za-z0-9А-Яа-яЁё \\-_]{0,30}[A-Za-z0-9А-Яа-яЁё]$';
+    static nameRegex = /^[\p{Letter}0-9][\p{Letter}0-9\-_\s]{0,30}[\p{Letter}0-9]$/u;
     static goodNameMessage = 'Great name :3';
     static nameRestrictionsMessage = '2-32 characters (A-z, 0-9, _, -)';
     static propTypes = {cookies: instanceOf(Cookies).isRequired};
