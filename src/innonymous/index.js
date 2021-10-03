@@ -1,3 +1,2 @@
-import Innonymous from 'innonymous/innonymous';
-
+import Innonymous from 'innonymous/Innonymous';
 export default Innonymous;

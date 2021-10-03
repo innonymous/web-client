@@ -1,0 +1,5 @@
+@media (prefers-color-scheme: dark) {
+    .captcha-image {
+        filter: invert(80%) hue-rotate(90deg);
+    }
+}

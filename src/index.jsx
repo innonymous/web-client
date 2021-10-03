@@ -1,15 +1,19 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import Innonymous from 'innonymous';
+import {BrowserRouter} from 'react-router-dom';
 import {CookiesProvider} from 'react-cookie';
+
+import Innonymous from 'innonymous';
 
 
 ReactDOM.render(
     <React.StrictMode>
-        <CookiesProvider>
-            <Innonymous/>
-        </CookiesProvider>
+        <BrowserRouter>
+            <CookiesProvider>
+                <Innonymous/>
+            </CookiesProvider>
+        </BrowserRouter>
     </React.StrictMode>,
     document.getElementById('root')
 );
