@@ -1,3 +1,7 @@
 .name-placeholder {
     width: 100px
 }
+
+.message-data {
+    white-space: pre-line;
+}

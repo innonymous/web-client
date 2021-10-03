@@ -5,6 +5,8 @@ import {instanceOf} from 'prop-types';
 import {Cookies, withCookies} from 'react-cookie';
 import Placeholder from "react-bootstrap/Placeholder";
 
+import 'innonymous/assets/css/chat/message.css';
+
 
 class Message extends React.Component {
     static propTypes = {cookies: instanceOf(Cookies).isRequired};
@@ -22,7 +24,7 @@ class Message extends React.Component {
                         {this.renderTime()}
                     </small>
                 </Toast.Header>
-                <Toast.Body>
+                <Toast.Body className={'message-data'}>
                     {this.props.message.data}
                 </Toast.Body>
             </Toast>
