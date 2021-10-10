@@ -1,3 +1,2 @@
-import Rooms from 'innonymous/components/rooms/rooms';
-
+import Rooms from 'innonymous/components/rooms/Rooms';
 export default Rooms;

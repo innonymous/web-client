@@ -1,7 +1,6 @@
 import ReconnectingWebSocket from 'reconnecting-websocket';
 
-
-export default class Api {
+class Api {
     static url = process.env.REACT_APP_API_URL || window.API_URL;
     static webSocketClient = new ReconnectingWebSocket(
         Api.getWebSocketUrl(), [], {
@@ -89,8 +88,11 @@ export default class Api {
     static getWebSocketUrl() {
         const url = new URL(Api.makeUrl('messages/updates'));
 
-        url.protocol = 'ws'
+        // Secure.
+        url.protocol = url.protocol === 'https:' ? 'wss:' : 'ws:';
 
         return url.toString();
     }
 }
+
+export default Api;

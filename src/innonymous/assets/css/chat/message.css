@@ -1,11 +1,7 @@
-.toast {
-    margin: 20px;
+.name-placeholder {
+    width: 100px
 }
 
-.right-message {
-    margin-left: auto;
-}
-
-.left-message {
-    margin-right: auto;
+.message-data {
+    white-space: pre-line;
 }

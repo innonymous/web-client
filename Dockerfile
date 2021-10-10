@@ -19,4 +19,6 @@ FROM nginx:stable
 COPY --from=build /app/build /usr/share/nginx/html
 
 # This commad setup API_URL.
-CMD sed -i "s%API_URL_PLACEHOLDER%${REACT_APP_API_URL}%g" "/usr/share/nginx/html/index.html" && nginx -g "daemon off;"
+CMD sed -i "s%index  index.html index.htm;%try_files \$uri /index.html;%g" "/etc/nginx/conf.d/default.conf" && \
+    sed -i "s%API_URL_PLACEHOLDER%${REACT_APP_API_URL}%g" "/usr/share/nginx/html/index.html" && \
+    nginx -g "daemon off;"
