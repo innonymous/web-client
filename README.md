@@ -6,15 +6,6 @@
 #### Web implementation of Innonymous chat
 
 
-## Architecture brief view
-
-Below you can find UML/Design diagram of React containers and web UI boxes
-
-
-<p align="center">
-<img src="images/arch_front.png"/>
-</p>
-
 ## Install and run
 
 1. Install `node` and `npm`. [Guide](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm)
